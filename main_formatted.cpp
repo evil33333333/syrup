@@ -9,6 +9,7 @@ static const std::string base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" "abcdefghij
 unsigned short RED_COLOR = 12;
 unsigned short GREEN_COLOR = 10;
 unsigned short CYAN_COLOR = 11;
+unsigned short YELLOW_COLOR = 14;
 bool finished = false;
 
 static inline bool is_base64(unsigned char c)
@@ -65,6 +66,14 @@ std::string encode(unsigned char
 	return ret;
 }
 */
+int GetRandomColor() {
+	int random_number = std::rand() % 5;
+	if (random_number == 0) return RED_COLOR;
+	if (random_number == 1) return GREEN_COLOR;
+	if (random_number == 2) return CYAN_COLOR;
+	if (random_number == 3) return YELLOW_COLOR;
+	if (random_number == 4) GetRandomColor();
+}
 
 static std::string encode(const std::string& in) {
 
@@ -85,12 +94,14 @@ static std::string encode(const std::string& in) {
 
 void syrup(std::string content, std::string path, int cycles)
 {
-	std::string encoded_content = encode(content);
+	std::string encoded_content = encode(content); int cycles_finished = 0;
 	std::string all_encoded_content = "import base64\nexec(base64.b64decode('" + encoded_content + "'))";
 	for (int i = 0; i < cycles; i++)
 	{
 		std::string encoded_string = encode(all_encoded_content);
 		all_encoded_content = "import base64\nexec(base64.b64decode('" + encoded_string + "'))";
+		cycles_finished++;  std::string title = " title [Syrup Obfuscation] Cycles Finished [" + std::to_string(cycles_finished) + "/" + std::to_string(cycles) + "]";
+		system(title.c_str());
 	}
 	std::ofstream file;
 	file.open(path);
@@ -103,6 +114,9 @@ int main()
 {
 	HANDLE handle;
 	handle = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(handle, CYAN_COLOR);
+	std::cout << "Welcome to Syrup Obfuscation :3" << std::endl;
+	std::this_thread::sleep_for(std::chrono::seconds(3));
 	SetConsoleTextAttribute(handle, GREEN_COLOR);
 	std::cout << "Path: "; std::string path; std::cin >> path;
 	if (path.find(".py") == std::string::npos)
@@ -133,6 +147,7 @@ int main()
 	std::thread obfuscator(syrup, content, path, cycles);
 	while (!finished) 
 	{
+		SetConsoleTextAttribute(handle, GetRandomColor());
 		std::cout << "\r[/] Obfuscating with " << cycles << " cycles.\r"; std::cout << "\r[-] Obfuscating with " << cycles << " cycles..\r"; std::cout << "\r[\\] Obfuscating with "<< cycles << " cycles...\r";
 	}
 	SetConsoleTextAttribute(handle, CYAN_COLOR);
